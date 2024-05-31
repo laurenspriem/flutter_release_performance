@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       clusteringTimeVector = -1;
     });
-    final timesInSeconds = await compute(clusteringTimeInSeconds, 5000);
+    final timesInSeconds = await compute(clusteringTimeInSeconds, 10000);
     clusteringTimeVector = timesInSeconds;
     setState(() {});
   }
@@ -89,9 +89,10 @@ Future<int> clusteringTimeInSeconds(int embeddingAmount) async {
     if ((i + 1) % 250 == 0) {
       debugPrint("Processed ${i + 1} embeddings");
     }
+    final vectorEmbedding1 = vectorEmbeddings[i];
     double closestDistance = double.infinity;
     for (int j = i - 1; j >= 0; j--) {
-      final double distance = 1 - vectorEmbeddings[i].dot(vectorEmbeddings[j]);
+      final double distance = 1 - vectorEmbedding1.dot(vectorEmbeddings[j]);
       if (distance < closestDistance) {
         closestDistance = distance;
       }
