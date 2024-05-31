@@ -35,19 +35,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int clusteringTimeVector = 0;
-  int clusteringTimeList = 0;
-  int vectorSerializationTime = 0;
 
   void cluster() async {
     setState(() {
       clusteringTimeVector = -1;
-      clusteringTimeList = -1;
-      vectorSerializationTime = -1;
     });
     final timesInSeconds = await compute(clusteringTimeInSeconds, 5000);
-    clusteringTimeVector = timesInSeconds.$1;
-    clusteringTimeList = timesInSeconds.$2;
-    vectorSerializationTime = timesInSeconds.$3;
+    clusteringTimeVector = timesInSeconds;
     setState(() {});
   }
 
@@ -66,20 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
               'LinearClustering for 10K embeddings in ${kDebugMode ? 'debug' : 'release'} mode:',
             ),
             Text(
-              key: ValueKey(clusteringTimeVector + 1),
+              key: ValueKey(clusteringTimeVector),
               clusteringTimeVector == -1
                   ? 'running clustering'
                   : '$clusteringTimeVector seconds with Vectors',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Text(
-              key: ValueKey(clusteringTimeList + 2),
-              clusteringTimeList == -1 ? '' : '$clusteringTimeList seconds with Lists',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Text(
-              key: ValueKey(vectorSerializationTime + 3),
-              clusteringTimeList == -1 ? '' : 'Vectors creation took $vectorSerializationTime ms',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
@@ -94,18 +78,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Future<(int, int, int)> clusteringTimeInSeconds(int embeddingAmount) async {
+Future<int> clusteringTimeInSeconds(int embeddingAmount) async {
   // Create 10K fake embeddings
   final embeddings = List.generate(embeddingAmount, (_) => _createRandomEmbedding());
-  final startSerialization = DateTime.now();
   final List<Vector> vectorEmbeddings =
       embeddings.map((embedding) => Vector.fromList(embedding)).toList();
-  final serializationTime = DateTime.now().difference(startSerialization).inMilliseconds;
 
   final startTime = DateTime.now();
   for (int i = 1; i < embeddings.length; i++) {
     if ((i + 1) % 250 == 0) {
-      debugPrint("Processed ${i + 1} faces");
+      debugPrint("Processed ${i + 1} embeddings");
     }
     double closestDistance = double.infinity;
     for (int j = i - 1; j >= 0; j--) {
@@ -118,29 +100,7 @@ Future<(int, int, int)> clusteringTimeInSeconds(int embeddingAmount) async {
   final endTime = DateTime.now();
   final vectorClusteringTime = endTime.difference(startTime).inSeconds;
 
-  final startTimeEmbeddings = DateTime.now();
-  for (int i = 1; i < embeddings.length; i++) {
-    if ((i + 1) % 250 == 0) {
-      debugPrint("Processed ${i + 1} faces");
-    }
-    double closestDistance = double.infinity;
-    for (int j = i - 1; j >= 0; j--) {
-      double distance = 0;
-      final embeddings1 = embeddings[i];
-      final embeddings2 = embeddings[j];
-      for (int i = 0; i < 192; i++) {
-        distance += embeddings1[i] * embeddings2[i];
-      }
-      distance = 1 - distance;
-      if (distance < closestDistance) {
-        closestDistance = distance;
-      }
-    }
-  }
-  final endTimeEmbeddings = DateTime.now();
-  final listClusteringTime = endTimeEmbeddings.difference(startTimeEmbeddings).inSeconds;
-
-  return (vectorClusteringTime, listClusteringTime, serializationTime);
+  return vectorClusteringTime;
 }
 
 List<double> _createRandomEmbedding([int length = 192]) {
