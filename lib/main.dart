@@ -125,7 +125,11 @@ Future<(int, int, int)> clusteringTimeInSeconds([int embeddingAmount = 5000]) as
     }
     double closestDistance = double.infinity;
     for (int j = i - 1; j >= 0; j--) {
-      final double distance = _calculateDistance(embeddings[i], embeddings[j]);
+      double distance = 0;
+      for (int i = 0; i < embeddings[i].length; i++) {
+        distance += embeddings[i][i] * embeddings[j][i];
+      }
+      distance = 1 - distance;
       if (distance < closestDistance) {
         closestDistance = distance;
       }
@@ -135,14 +139,6 @@ Future<(int, int, int)> clusteringTimeInSeconds([int embeddingAmount = 5000]) as
   final listClusteringTime = endTimeEmbeddings.difference(startTimeEmbeddings).inSeconds;
 
   return (vectorClusteringTime, listClusteringTime, serializationTime);
-}
-
-double _calculateDistance(List<double> embedding1, List<double> embedding2) {
-  double distance = 0;
-  for (int i = 0; i < embedding1.length; i++) {
-    distance += embedding1[i] * embedding2[i];
-  }
-  return 1 - distance;
 }
 
 List<double> _createRandomEmbedding([int length = 192]) {
