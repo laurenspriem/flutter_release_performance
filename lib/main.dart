@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
       clusteringTimeList = -1;
       vectorSerializationTime = -1;
     });
-    final timesInSeconds = await compute(clusteringTimeInSeconds, 10000);
+    final timesInSeconds = await compute(clusteringTimeInSeconds, 5000);
     clusteringTimeVector = timesInSeconds.$1;
     clusteringTimeList = timesInSeconds.$2;
     vectorSerializationTime = timesInSeconds.$3;
@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Future<(int, int, int)> clusteringTimeInSeconds([int embeddingAmount = 5000]) async {
+Future<(int, int, int)> clusteringTimeInSeconds(int embeddingAmount) async {
   // Create 10K fake embeddings
   final embeddings = List.generate(embeddingAmount, (_) => _createRandomEmbedding());
   final startSerialization = DateTime.now();
@@ -126,8 +126,10 @@ Future<(int, int, int)> clusteringTimeInSeconds([int embeddingAmount = 5000]) as
     double closestDistance = double.infinity;
     for (int j = i - 1; j >= 0; j--) {
       double distance = 0;
-      for (int i = 0; i < embeddings[i].length; i++) {
-        distance += embeddings[i][i] * embeddings[j][i];
+      final embeddings1 = embeddings[i];
+      final embeddings2 = embeddings[j];
+      for (int i = 0; i < 192; i++) {
+        distance += embeddings1[i] * embeddings2[i];
       }
       distance = 1 - distance;
       if (distance < closestDistance) {
