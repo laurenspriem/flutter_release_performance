@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -105,7 +106,7 @@ Future<(int, int, int)> clusteringTimeInSeconds(int embeddingAmount) async {
   final startTime = DateTime.now();
   for (int i = 1; i < embeddings.length; i++) {
     if ((i + 1) % 250 == 0) {
-      debugPrint("Processed ${i + 1} faces");
+      debugPrint("Processed ${i + 1} faces VECTOR");
     }
     double closestDistance = double.infinity;
     for (int j = i - 1; j >= 0; j--) {
@@ -121,15 +122,19 @@ Future<(int, int, int)> clusteringTimeInSeconds(int embeddingAmount) async {
   final startTimeEmbeddings = DateTime.now();
   for (int i = 1; i < embeddings.length; i++) {
     if ((i + 1) % 250 == 0) {
-      debugPrint("Processed ${i + 1} faces");
+      debugPrint("Processed ${i + 1} faces LIST");
     }
     double closestDistance = double.infinity;
+    final embeddings1 = embeddings[i];
     for (int j = i - 1; j >= 0; j--) {
       double distance = 0;
-      final embeddings1 = embeddings[i];
       final embeddings2 = embeddings[j];
-      for (int i = 0; i < 192; i++) {
-        distance += embeddings1[i] * embeddings2[i];
+      for (int i = 0; i < 192; i = i + 4) {
+        double a = embeddings1[i] * embeddings2[i];
+        double b = embeddings1[i + 1] * embeddings2[i + 1];
+        double c = embeddings1[i + 2] * embeddings2[i + 2];
+        double d = embeddings1[i + 3] * embeddings2[i + 3];
+        distance += a + b + c + d;
       }
       distance = 1 - distance;
       if (distance < closestDistance) {
