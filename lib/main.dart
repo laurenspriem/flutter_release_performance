@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
               key: ValueKey(clusteringTime),
               clusteringTime == -1
                   ? 'running clustering'
-                  : '$clusteringTime seconds with Vectors',
+                  : '$clusteringTime seconds',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
@@ -78,7 +78,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 Future<int> clusteringTimeInSeconds(int embeddingAmount) async {
   // Create 10K fake embeddings
-  final embeddings = List.generate(embeddingAmount, (_) => _createRandomEmbedding());
+  final embeddings =
+      List.generate(embeddingAmount, (_) => _createRandomEmbedding());
 
   final startTime = DateTime.now();
   for (int i = 1; i < embeddings.length; i++) {
