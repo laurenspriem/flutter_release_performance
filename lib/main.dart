@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       clusteringTime = -1;
     });
-    clusteringTime = await compute(clusteringTimeInSeconds, 5000);
+    clusteringTime = await compute(clusteringTimeInSeconds, 10000);
     setState(() {});
   }
 
@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Future<int> clusteringTimeInSeconds(int embeddingAmount) async {
+Future<int> clusteringTimeInSeconds([int embeddingAmount = 10000]) async {
   // Create 10K fake embeddings
   final embeddings =
       List.generate(embeddingAmount, (_) => _createRandomEmbedding());
